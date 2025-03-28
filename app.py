@@ -49,14 +49,14 @@ def generate_invoice(data):
     pdf.set_font("Arial", "", 10)
     total = 0
     for i, product in enumerate(data['products']):
+        amount = round(product['qty'] * product['rate'], 2)
+        total += amount
         pdf.cell(10, 6, str(i+1), border=1)
         pdf.cell(80, 6, product['name'], border=1)
         pdf.cell(20, 6, product['hsn_sac'], border=1)
         pdf.cell(15, 6, str(product['qty']), border=1)
-        pdf.cell(20, 6, str(product['rate']), border=1)
-        amount = product['qty'] * product['rate']
-        total += amount
-        pdf.cell(30, 6, str(amount), border=1, ln=True)
+        pdf.cell(20, 6, f"{product['rate']:.2f}", border=1)
+        pdf.cell(30, 6, f"{amount:.2f}", border=1, ln=True)
     
     pdf.ln(5)
 
@@ -67,16 +67,16 @@ def generate_invoice(data):
 
     # Right-Aligned Totals
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
-    pdf.cell(30, 6, str(total), border=1, ln=True)
+    pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
     
     pdf.cell(145, 6, "CGST (9%):", border=0, align='R')
-    pdf.cell(30, 6, str(cgst), border=1, ln=True)
+    pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
     
     pdf.cell(145, 6, "SGST (9%):", border=0, align='R')
-    pdf.cell(30, 6, str(sgst), border=1, ln=True)
+    pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
     
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
-    pdf.cell(30, 6, str(total_after_tax), border=1, ln=True)
+    pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
     
     pdf.ln(10)
     
@@ -106,7 +106,7 @@ st.title("Invoice Generator")
 # Invoice Details
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
-reverse_charge = st.selectbox("Reverse Charge", ["Yes", "No"])
+reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
@@ -133,19 +133,10 @@ for i in range(n):
     products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
-    invoice_data = {
-        "invoice_no": invoice_no,
-        "invoice_date": invoice_date,
-        "reverse_charge": reverse_charge,
-        "billed_to_name": billed_to_name,
-        "billed_to_gstin": billed_to_gstin,
-        "billed_to_address": billed_to_address,
-        "billed_to_state": billed_to_state,
-        "shipped_to_name": shipped_to_name,
-        "shipped_to_gstin": shipped_to_gstin,
-        "shipped_to_address": shipped_to_address,
-        "shipped_to_state": shipped_to_state,
-        "products": products
-    }
+    invoice_data = {"invoice_no": invoice_no, "invoice_date": invoice_date, "reverse_charge": reverse_charge, 
+                    "billed_to_name": billed_to_name, "billed_to_gstin": billed_to_gstin, 
+                    "billed_to_address": billed_to_address, "billed_to_state": billed_to_state, 
+                    "shipped_to_name": shipped_to_name, "shipped_to_gstin": shipped_to_gstin, 
+                    "shipped_to_address": shipped_to_address, "shipped_to_state": shipped_to_state, "products": products}
     pdf = generate_invoice(invoice_data)
     st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
