@@ -29,6 +29,7 @@ def generate_invoice(data):
     pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
     pdf.cell(100, 6, f"State: Haryana  State Code: 06")
     pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
+    pdf.cell(100, 6, f"E-Way Bill No: {data['eway_bill_no']}", ln=True)  # Added E-Way Bill No.
     pdf.ln(5)
     
     # Billed To
@@ -99,27 +100,6 @@ def generate_invoice(data):
     pdf.ln(5)
     pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
 
-    # Footer Section
-    pdf.ln(20)  
-     # Bank Details
-    pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "Bank Details:", ln=True)
-    pdf.set_font("Arial", "", 10)
-    pdf.cell(200, 6, "Bank Name: Punjab National Bank", ln=True)
-    pdf.cell(200, 6, "Account No.: 005308700006153", ln=True)
-    pdf.cell(200, 6, "IFSC Code: PUNB0005300", ln=True)
-    pdf.ln(10)
-    
-    # Terms & Conditions
-    pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "Terms & Conditions:", ln=True)
-    pdf.set_font("Arial", "", 8)
-    pdf.multi_cell(200, 5, "1. Goods once sold will not be taken back.\n2. Interest @18% p.a. will be charged if payment is not made in stipulated time.\n3. Subject to BHIWANI Jurisdiction Only.")
-    
-    pdf.ln(10)
-    pdf.cell(200, 6, "For: PRITI ENTERPRISES", ln=True, align='R')
-    pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
-    
     return pdf.output(dest='S').encode('latin1')
 
 st.title("Invoice Generator")
@@ -128,6 +108,9 @@ st.title("Invoice Generator")
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
 reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
+
+# **New Field: E-Way Bill Number**
+eway_bill_no = st.text_input("E-Way Bill No", "")
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
@@ -146,18 +129,7 @@ cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.
 sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
 igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
 
-# Product Details
-st.subheader("Products / Services")
-products = []
-n = st.number_input("Number of Products", min_value=1, step=1)
-for i in range(n):
-    st.write(f"### Product {i+1}")
-    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
-    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
-    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
-    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
-    products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
-
+# Generate Invoice Button
 if st.button("Generate Invoice"):
     invoice_data = locals()
     pdf = generate_invoice(invoice_data)
