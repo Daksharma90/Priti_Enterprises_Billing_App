@@ -13,7 +13,7 @@ def generate_invoice(data):
     pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
     pdf.cell(50, 10, "GSTIN: 06APGPK2323H1Z8", align='L')
 
-    pdf.set_font("Arial", "B", 16)  # Bigger font for PRITI ENTERPRISES
+    pdf.set_font("Arial", "B", 20)  # Bigger font for PRITI ENTERPRISES
     pdf.cell(100, 10, "PRITI ENTERPRISES", align='C')
 
     pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
