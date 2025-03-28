@@ -35,14 +35,14 @@ def generate_invoice(data):
     pdf.cell(100, 6, "Billed To:")
     pdf.cell(100, 6, "Shipped To:", ln=True)
     pdf.set_font("Arial", "", 10)
-    pdf.cell(100, 6, f"Name: {data['billed_to_name']}")
-    pdf.cell(100, 6, f"Name: {data['shipped_to_name']}", ln=True)
-    pdf.cell(100, 6, f"GSTIN: {data['billed_to_gstin']}")
-    pdf.cell(100, 6, f"GSTIN: {data['shipped_to_gstin']}", ln=True)
-    pdf.cell(100, 6, f"Address: {data['billed_to_address']}")
-    pdf.cell(100, 6, f"Address: {data['shipped_to_address']}", ln=True)
-    pdf.cell(100, 6, f"State: {data['billed_to_state']}")
-    pdf.cell(100, 6, f"State: {data['shipped_to_state']}", ln=True)
+    pdf.cell(100, 6, f"Name: {data['billed_to_name']}", ln=True)  # Name first
+    pdf.cell(100, 6, f"Name: {data['shipped_to_name']}", ln=True)  # Name first
+    pdf.cell(100, 6, f"Address: {data['billed_to_address']}", ln=True) # Address second
+    pdf.cell(100, 6, f"Address: {data['shipped_to_address']}", ln=True) # Address second
+    pdf.cell(100, 6, f"GSTIN: {data['billed_to_gstin']}", ln=True)  # GSTIN third
+    pdf.cell(100, 6, f"GSTIN: {data['shipped_to_gstin']}", ln=True)  # GSTIN third
+    pdf.cell(100, 6, f"State: {data['billed_to_state']}")    # State fourth
+    pdf.cell(100, 6, f"State: {data['shipped_to_state']}")    # State fourth
     pdf.ln(5)
 
     # Transportation Details
@@ -141,14 +141,14 @@ reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
-billed_to_gstin = st.text_input("Billed To - GSTIN")
 billed_to_address = st.text_area("Billed To - Address")
+billed_to_gstin = st.text_input("Billed To - GSTIN")
 billed_to_state = st.text_input("Billed To - State")
 
 # Shipped To
 shipped_to_name = st.text_input("Shipped To - Name")
-shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
+shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_state = st.text_input("Shipped To - State")
 
 # Transportation Details
