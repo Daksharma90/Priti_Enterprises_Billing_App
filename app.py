@@ -1,7 +1,7 @@
 import streamlit as st
 from fpdf import FPDF
 import datetime
-from num2words import num2words
+from num2words import num2words  # Added for amount in words
 
 def generate_invoice(data):
     pdf = FPDF()
@@ -61,37 +61,40 @@ def generate_invoice(data):
     
     pdf.ln(5)
 
-    # Tax Calculation
-    cgst = round(total * (data['cgst'] / 100), 2)
-    sgst = round(total * (data['sgst'] / 100), 2)
-    igst = round(total * (data['igst'] / 100), 2)
+    # Tax Calculation (User Input)
+    cgst_rate = data['cgst_rate'] / 100
+    sgst_rate = data['sgst_rate'] / 100
+    igst_rate = data['igst_rate'] / 100
+
+    cgst = round(total * cgst_rate, 2)
+    sgst = round(total * sgst_rate, 2)
+    igst = round(total * igst_rate, 2)
+    
     total_after_tax = round(total + cgst + sgst + igst, 2)
+
+    # Convert total amount to words
+    total_in_words = num2words(total_after_tax, lang='en').capitalize() + " only"
 
     # Right-Aligned Totals
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
     
-    pdf.cell(145, 6, f"CGST ({data['cgst']}%):", border=0, align='R')
+    pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
     
-    pdf.cell(145, 6, f"SGST ({data['sgst']}%):", border=0, align='R')
+    pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
-    
-    pdf.cell(145, 6, f"IGST ({data['igst']}%):", border=0, align='R')
+
+    pdf.cell(145, 6, f"IGST ({data['igst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
     
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
     
+    # Display total amount in words
     pdf.ln(5)
-    
-    # Total Amount in Words
-    amount_in_words = num2words(total_after_tax, to='currency', lang='en_IN')
-    pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "Total Amount (in words):", ln=True)
-    pdf.set_font("Arial", "", 10)
-    pdf.multi_cell(200, 6, f"{amount_in_words} only", border=1)
-    
+    pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
+
     pdf.ln(10)
     
     # Bank Details
@@ -122,13 +125,24 @@ invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
 reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
-# CGST, SGST, IGST Inputs
-cgst = st.number_input("CGST (%)", min_value=0.0, step=0.1)
-sgst = st.number_input("SGST (%)", min_value=0.0, step=0.1)
-igst = st.number_input("IGST (%)", min_value=0.0, step=0.1)
+# Tax Input
+cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, value=9.0)
+sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, step=0.1, value=9.0)
+igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, step=0.1, value=0.0)
+
+# Product Details
+st.subheader("Products / Services")
+products = []
+n = st.number_input("Number of Products", min_value=1, step=1)
+for i in range(n):
+    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
+    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
+    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
+    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
+    products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
     invoice_data = {"invoice_no": invoice_no, "invoice_date": invoice_date, "reverse_charge": reverse_charge, 
-                    "cgst": cgst, "sgst": sgst, "igst": igst}
+                    "products": products, "cgst_rate": cgst_rate, "sgst_rate": sgst_rate, "igst_rate": igst_rate}
     pdf = generate_invoice(invoice_data)
     st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
