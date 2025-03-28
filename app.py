@@ -90,6 +90,25 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     pdf.ln(10)
     pdf.cell(95, 7, "Authorized Signature", ln=True, align='L')
     
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=f"invoice_{invoice_no}.pdf")
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     pdf.output(temp_file.name)
     return temp_file.name
+
+st.title("Invoice Generator")
+invoice_no = st.text_input("Invoice No")
+invoice_date = st.date_input("Invoice Date", datetime.date.today())
+customer_name = st.text_input("Customer Name")
+address = st.text_area("Customer Address")
+gstin = st.text_input("GSTIN")
+state = st.text_input("State")
+transport_mode = st.text_input("Transport Mode")
+vehicle_no = st.text_input("Vehicle No")
+eway_bill = st.text_input("E-Way Bill No")
+cgst = st.number_input("CGST (%)", min_value=0.0)
+sgst = st.number_input("SGST (%)", min_value=0.0)
+igst = st.number_input("IGST (%)", min_value=0.0)
+
+if st.button("Generate Invoice"):
+    pdf_path = generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, [], cgst, sgst, igst)
+    with open(pdf_path, "rb") as file:
+        st.download_button("Download Invoice", file, file_name="invoice.pdf")
