@@ -5,7 +5,9 @@ import os
 from num2words import num2words
 import datetime
 
-def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, items, cgst, sgst, igst):
+def generate_invoice(invoice_no, invoice_date, receiver_name, receiver_address, receiver_gstin, receiver_state,
+                      consignee_name, consignee_address, consignee_gstin, consignee_state, transport_mode, vehicle_no,
+                      date_of_supply, place_of_supply, items, cgst, sgst, igst):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
@@ -20,35 +22,34 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     pdf.set_font("Arial", "B", 11)
     pdf.cell(95, 8, f"Invoice No: {invoice_no}")
     pdf.cell(95, 8, f"Invoice Date: {invoice_date}", ln=True)
-    pdf.cell(95, 8, f"State: {state} (State Code: 06)", ln=True)
+    pdf.cell(95, 8, f"State: Haryana (State Code: 06)")
+    pdf.cell(95, 8, f"Date of Supply: {date_of_supply}", ln=True)
+    pdf.cell(95, 8, f"Place of Supply: {place_of_supply}", ln=True)
     pdf.cell(95, 8, f"Transport Mode: {transport_mode}")
     pdf.cell(95, 8, f"Vehicle No: {vehicle_no}", ln=True)
     pdf.ln(5)
     
     pdf.set_font("Arial", "B", 11)
-    pdf.cell(190, 7, "Details of Receiver / Billed to:", ln=True)
+    pdf.cell(95, 7, "Details of Receiver | Billed to:")
+    pdf.cell(95, 7, "Details of Consignee | Shipped to:", ln=True)
     pdf.set_font("Arial", size=11)
-    pdf.cell(190, 7, f"Name: {customer_name}", ln=True)
-    pdf.cell(190, 7, f"Address: {address}", ln=True)
-    pdf.cell(190, 7, f"GSTIN: {gstin}", ln=True)
+    pdf.cell(95, 7, f"Name: {receiver_name}")
+    pdf.cell(95, 7, f"Name: {consignee_name}", ln=True)
+    pdf.cell(95, 7, f"Address: {receiver_address}")
+    pdf.cell(95, 7, f"Address: {consignee_address}", ln=True)
+    pdf.cell(95, 7, f"GSTIN: {receiver_gstin}")
+    pdf.cell(95, 7, f"GSTIN: {consignee_gstin}", ln=True)
+    pdf.cell(95, 7, f"State: {receiver_state}")
+    pdf.cell(95, 7, f"State: {consignee_state}", ln=True)
     pdf.ln(5)
     
     pdf.set_font("Arial", "B", 11)
-    pdf.cell(190, 7, "Ship To:", ln=True)
-    pdf.set_font("Arial", size=11)
-    pdf.cell(190, 7, f"Name: {customer_name}", ln=True)
-    pdf.cell(190, 7, f"Address: {address}", ln=True)
-    pdf.cell(190, 7, f"GSTIN: {gstin}", ln=True)
-    pdf.ln(5)
-    
-    pdf.set_font("Arial", "B", 11)
-    pdf.cell(10, 8, "S.No", border=1, align='C')
-    pdf.cell(50, 8, "Product Name", border=1, align='C')
+    pdf.cell(10, 8, "Sr. No", border=1, align='C')
+    pdf.cell(60, 8, "Name of Product / Service", border=1, align='C')
     pdf.cell(20, 8, "HSN/SAC", border=1, align='C')
     pdf.cell(15, 8, "Qty", border=1, align='C')
-    pdf.cell(20, 8, "Rate", border=1, align='C')
+    pdf.cell(25, 8, "Rate", border=1, align='C')
     pdf.cell(25, 8, "Amount", border=1, align='C')
-    pdf.cell(25, 8, "GST Payable RCM", border=1, align='C')
     pdf.ln()
     
     total_amount = 0
@@ -57,36 +58,32 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
         amount = int(qty) * float(rate)
         total_amount += amount
         pdf.cell(10, 8, str(i), border=1, align='C')
-        pdf.cell(50, 8, name, border=1, align='L')
+        pdf.cell(60, 8, name, border=1, align='L')
         pdf.cell(20, 8, hsn, border=1, align='C')
         pdf.cell(15, 8, str(qty), border=1, align='C')
-        pdf.cell(20, 8, str(rate), border=1, align='C')
+        pdf.cell(25, 8, str(rate), border=1, align='C')
         pdf.cell(25, 8, str(amount), border=1, align='C')
-        pdf.cell(25, 8, "No", border=1, align='C')
         pdf.ln()
     
     pdf.ln(5)
-    cgst_amount = (total_amount * cgst) / 100
-    sgst_amount = (total_amount * sgst) / 100
-    igst_amount = (total_amount * igst) / 100
-    total_after_tax = total_amount + cgst_amount + sgst_amount + igst_amount
-    
     pdf.cell(120, 7, "Total Before Tax:", align='L')
     pdf.cell(70, 7, f"{total_amount:.2f}", align='R', ln=True)
     pdf.cell(120, 7, f"CGST ({cgst}%):", align='L')
-    pdf.cell(70, 7, f"{cgst_amount:.2f}", align='R', ln=True)
+    pdf.cell(70, 7, f"{(total_amount * cgst) / 100:.2f}", align='R', ln=True)
     pdf.cell(120, 7, f"SGST ({sgst}%):", align='L')
-    pdf.cell(70, 7, f"{sgst_amount:.2f}", align='R', ln=True)
+    pdf.cell(70, 7, f"{(total_amount * sgst) / 100:.2f}", align='R', ln=True)
     pdf.cell(120, 7, f"IGST ({igst}%):", align='L')
-    pdf.cell(70, 7, f"{igst_amount:.2f}", align='R', ln=True)
-    pdf.cell(190, 7, f"Total in Words: {num2words(total_after_tax, lang='en_IN')} Rupees only", ln=True)
+    pdf.cell(70, 7, f"{(total_amount * igst) / 100:.2f}", align='R', ln=True)
     
     pdf.ln(10)
-    pdf.cell(190, 7, f"E-Way Bill No: {eway_bill}", ln=True)
-    pdf.ln(5)
     pdf.cell(190, 7, "Bank Details: Punjab National Bank", ln=True)
     pdf.cell(190, 7, "A/c No.: 005308700006153", ln=True)
     pdf.cell(190, 7, "IFSC Code: PUNB0005300", ln=True)
+    pdf.ln(10)
+    pdf.cell(190, 7, "Terms & Conditions:", ln=True)
+    pdf.cell(190, 7, "1. Goods once sold will not be taken back.", ln=True)
+    pdf.cell(190, 7, "2. Interest @ 18% p.a. will be charged if payment is not made in time.", ln=True)
+    pdf.cell(190, 7, "3. Subject to Bhiwani Jurisdiction Only.", ln=True)
     pdf.ln(10)
     pdf.cell(95, 7, "Authorized Signature", ln=True, align='L')
     
@@ -95,20 +92,20 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     return temp_file.name
 
 st.title("Invoice Generator")
-invoice_no = st.text_input("Invoice No")
-invoice_date = st.date_input("Invoice Date", datetime.date.today())
-customer_name = st.text_input("Customer Name")
-address = st.text_area("Customer Address")
-gstin = st.text_input("GSTIN")
-state = st.text_input("State")
-transport_mode = st.text_input("Transport Mode")
-vehicle_no = st.text_input("Vehicle No")
-eway_bill = st.text_input("E-Way Bill No")
-cgst = st.number_input("CGST (%)", min_value=0.0)
-sgst = st.number_input("SGST (%)", min_value=0.0)
-igst = st.number_input("IGST (%)", min_value=0.0)
-
-if st.button("Generate Invoice"):
-    pdf_path = generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, [], cgst, sgst, igst)
-    with open(pdf_path, "rb") as file:
-        st.download_button("Download Invoice", file, file_name="invoice.pdf")
+st.text_input("Invoice No")
+st.date_input("Invoice Date", datetime.date.today())
+st.text_input("Receiver Name")
+st.text_area("Receiver Address")
+st.text_input("Receiver GSTIN")
+st.text_input("Receiver State")
+st.text_input("Consignee Name")
+st.text_area("Consignee Address")
+st.text_input("Consignee GSTIN")
+st.text_input("Consignee State")
+st.text_input("Transport Mode")
+st.text_input("Vehicle No")
+st.text_input("Date of Supply")
+st.text_input("Place of Supply")
+st.number_input("CGST (%)", min_value=0.0)
+st.number_input("SGST (%)", min_value=0.0)
+st.number_input("IGST (%)", min_value=0.0)
