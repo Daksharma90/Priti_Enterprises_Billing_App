@@ -3,6 +3,7 @@ from fpdf import FPDF
 import datetime
 from num2words import num2words  # Added for amount in words
 
+
 def generate_invoice(data):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -23,7 +24,7 @@ def generate_invoice(data):
     pdf.set_fill_color(240, 240, 240)  # Light gray background
     pdf.set_line_width(0.1)
     pdf.rect(10, pdf.y, 90, 40, 'DF')  # Box around Billed To
-    pdf.rect(110, pdf.y, 90, 40, 'DF') # Box around Shipped To
+    pdf.rect(110, pdf.y, 90, 40, 'DF')  # Box around Shipped To
     pdf.set_font("Arial", "B", 10)
     pdf.text(12, pdf.y + 5, "Billed To:")
     pdf.text(112, pdf.y + 5, "Shipped To:")
@@ -88,15 +89,15 @@ def generate_invoice(data):
     igst = round(total * (data['igst_rate'] / 100), 2)
     total_after_tax = round(total + cgst + sgst + igst, 2)
 
-    if cgst > 0:
-        pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%)", border=0, align='R')
-        pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
-    if sgst > 0:
-        pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%)", border=0, align='R')
-        pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
-    if igst > 0:
-        pdf.cell(145, 6, f"IGST ({data['igst_rate']}%)", border=0, align='R')
-        pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
+    # Display CGST, SGST, and IGST even if zero
+    pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%)", border=0, align='R')
+    pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
+
+    pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%)", border=0, align='R')
+    pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
+
+    pdf.cell(145, 6, f"IGST ({data['igst_rate']}%)", border=0, align='R')
+    pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
 
     pdf.set_font("Arial", "B", 10)
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
@@ -143,6 +144,7 @@ def generate_invoice(data):
     pdf.cell(0, 5, "Authorized Signatory", align='R')
 
     return pdf.output(dest='S').encode('latin1')
+
 
 # Streamlit UI (Remains largely the same)
 st.title("Invoice Generator")
