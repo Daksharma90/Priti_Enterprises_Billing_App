@@ -92,10 +92,27 @@ def generate_invoice(data):
 
     # Footer Section
     pdf.ln(20)  
+     # Bank Details
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "For PRITI ENTERPRISES", ln=True, align='R')
-    pdf.ln(15)
+    pdf.cell(200, 6, "Bank Details:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(200, 6, "Bank Name: Punjab National Bank", ln=True)
+    pdf.cell(200, 6, "Account No.: 005308700006153", ln=True)
+    pdf.cell(200, 6, "IFSC Code: PUNB0005300", ln=True)
+    pdf.ln(10)
+    
+    # Terms & Conditions
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(200, 6, "Terms & Conditions:", ln=True)
+    pdf.set_font("Arial", "", 8)
+    pdf.multi_cell(200, 5, "1. Goods once sold will not be taken back.\n2. Interest @18% p.a. will be charged if payment is not made in stipulated time.\n3. Subject to BHIWANI Jurisdiction Only.")
+    
+    pdf.ln(10)
+    pdf.cell(200, 6, "For: PRITI ENTERPRISES", ln=True, align='R')
     pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
+    
+    return pdf.output(dest='S').encode('latin1')
+
 
     return pdf.output(dest='S').encode('latin1')
 
