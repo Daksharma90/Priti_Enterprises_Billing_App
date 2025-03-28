@@ -117,46 +117,21 @@ def generate_invoice(data):
     pdf.multi_cell(200, 5, "1. Goods once sold will not be taken back.\n2. Interest @18% p.a. will be charged if payment is not made in stipulated time.\n3. Subject to BHIWANI Jurisdiction Only.")
     
     pdf.ln(10)
+    
+    # **E-Way Bill Number**
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(200, 6, "E-Way Bill Number:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(200, 6, data['eway_bill_no'], ln=True)
+    
+    pdf.ln(10)
     pdf.cell(200, 6, "For: PRITI ENTERPRISES", ln=True, align='R')
     pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
     
     return pdf.output(dest='S').encode('latin1')
 
-st.title("Invoice Generator")
-
-# Invoice Details
-invoice_no = st.text_input("Invoice No", "249")
-invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
-reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
-
-# Billed To
-billed_to_name = st.text_input("Billed To - Name")
-billed_to_gstin = st.text_input("Billed To - GSTIN")
-billed_to_address = st.text_area("Billed To - Address")
-billed_to_state = st.text_input("Billed To - State")
-
-# Shipped To
-shipped_to_name = st.text_input("Shipped To - Name")
-shipped_to_gstin = st.text_input("Shipped To - GSTIN")
-shipped_to_address = st.text_area("Shipped To - Address")
-shipped_to_state = st.text_input("Shipped To - State")
-
-# Tax Rates (User Input)
-cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-
-# Product Details
-st.subheader("Products / Services")
-products = []
-n = st.number_input("Number of Products", min_value=1, step=1)
-for i in range(n):
-    st.write(f"### Product {i+1}")
-    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
-    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
-    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
-    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
-    products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
+# **E-Way Bill Input Field**
+eway_bill_no = st.text_input("E-Way Bill Number", "")
 
 if st.button("Generate Invoice"):
     invoice_data = locals()
