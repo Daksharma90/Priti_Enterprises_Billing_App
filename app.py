@@ -34,16 +34,26 @@ def generate_invoice(data):
 
     # Address with multi-line support and fixed height
     address_line_height = 5  # Height for each line of address
+    address_lines = 3
+    address_box_height = address_lines * address_line_height
     address_y_start = pdf.y + 20
+
     pdf.set_xy(12, address_y_start)
     pdf.multi_cell(86, address_line_height, f"Address: {data['billed_to_address']}", border=0, max_line_height=address_line_height)
+    billed_address_height = pdf.y - address_y_start
 
     pdf.set_xy(112, address_y_start)
     pdf.multi_cell(86, address_line_height, f"Address: {data['shipped_to_address']}", border=0, max_line_height=address_line_height)
+    shipped_address_height = pdf.y - address_y_start
+
+    # Adjust box height if address takes more lines
+    box_extension = max(0, billed_address_height - address_box_height, shipped_address_height - address_box_height)
+    pdf.rect(10, pdf.y - 40, 90, 40 + box_extension, 'DF')  # Extend Billed To box if needed
+    pdf.rect(110, pdf.y - 40, 90, 40 + box_extension, 'DF')  # Extend Shipped To box if needed
 
     # GSTIN and State
-    gstin_y = address_y_start + 3 * address_line_height  # Position after 3 address rows
-    state_y = gstin_y + 8 # Position State after GSTIN
+    gstin_y = address_y_start + address_box_height
+    state_y = gstin_y + 8
 
     pdf.set_xy(12, gstin_y)
     pdf.cell(86, 6, f"GSTIN: {data['billed_to_gstin']}", border=0)
