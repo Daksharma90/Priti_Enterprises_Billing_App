@@ -3,42 +3,41 @@ from fpdf import FPDF
 import tempfile
 import os
 from num2words import num2words
+import datetime
 
-def generate_invoice(invoice_no, customer_name, address, gstin, state, items, cgst, sgst, igst):
+def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, items, cgst, sgst, igst):
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
     
     pdf.set_font("Arial", "B", 16)
-    pdf.cell(200, 10, "PRITI ENTERPRISES", ln=True, align='C')
+    pdf.cell(190, 10, "PRITI ENTERPRISES", ln=True, align='C')
     pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, "Near Santu Tubwel, Tosham Road Bypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
-    pdf.cell(200, 10, "GSTIN: 06APGPK2323H1Z8", ln=True, align='C')
-    pdf.ln(10)
+    pdf.cell(190, 7, "Near Santu Tubwel, Tosham Road Bypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
+    pdf.cell(190, 7, "GSTIN: 06APGPK2323H1Z8", ln=True, align='C')
+    pdf.ln(8)
     
-    pdf.set_font("Arial", "B", 12)
-    pdf.cell(100, 10, f"Invoice No: {invoice_no}")
-    pdf.cell(100, 10, f"Invoice Date: {st.session_state['invoice_date']}", ln=True)
-    pdf.cell(100, 10, f"State: {state} (State Code: 06)", ln=True)
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(95, 8, f"Invoice No: {invoice_no}")
+    pdf.cell(95, 8, f"Invoice Date: {invoice_date}", ln=True)
+    pdf.cell(95, 8, f"State: {state} (State Code: 06)", ln=True)
     pdf.ln(5)
     
-    pdf.set_font("Arial", "B", 12)
-    pdf.cell(100, 10, "Details of Receiver / Billed to:")
-    pdf.ln(5)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, f"Name: {customer_name}", ln=True)
-    pdf.cell(200, 10, f"Address: {address}", ln=True)
-    pdf.cell(200, 10, f"GSTIN: {gstin}", ln=True)
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(190, 7, "Details of Receiver / Billed to:", ln=True)
+    pdf.set_font("Arial", size=11)
+    pdf.cell(190, 7, f"Name: {customer_name}", ln=True)
+    pdf.cell(190, 7, f"Address: {address}", ln=True)
+    pdf.cell(190, 7, f"GSTIN: {gstin}", ln=True)
     pdf.ln(5)
     
-    pdf.set_font("Arial", "B", 12)
-    pdf.cell(10, 10, "S.No", border=1)
-    pdf.cell(50, 10, "Product Name", border=1)
-    pdf.cell(30, 10, "HSN/SAC", border=1)
-    pdf.cell(20, 10, "Qty", border=1)
-    pdf.cell(30, 10, "Rate", border=1)
-    pdf.cell(30, 10, "Amount", border=1)
-    pdf.cell(30, 10, "Taxable Value", border=1)
+    pdf.set_font("Arial", "B", 11)
+    pdf.cell(10, 8, "S.No", border=1, align='C')
+    pdf.cell(60, 8, "Product Name", border=1, align='C')
+    pdf.cell(25, 8, "HSN/SAC", border=1, align='C')
+    pdf.cell(20, 8, "Qty", border=1, align='C')
+    pdf.cell(25, 8, "Rate", border=1, align='C')
+    pdf.cell(30, 8, "Amount", border=1, align='C')
     pdf.ln()
     
     total_amount = 0
@@ -46,13 +45,12 @@ def generate_invoice(invoice_no, customer_name, address, gstin, state, items, cg
         name, hsn, qty, rate = item
         amount = int(qty) * float(rate)
         total_amount += amount
-        pdf.cell(10, 10, str(i), border=1)
-        pdf.cell(50, 10, name, border=1)
-        pdf.cell(30, 10, hsn, border=1)
-        pdf.cell(20, 10, str(qty), border=1)
-        pdf.cell(30, 10, str(rate), border=1)
-        pdf.cell(30, 10, str(amount), border=1)
-        pdf.cell(30, 10, str(amount), border=1)
+        pdf.cell(10, 8, str(i), border=1, align='C')
+        pdf.cell(60, 8, name, border=1, align='L')
+        pdf.cell(25, 8, hsn, border=1, align='C')
+        pdf.cell(20, 8, str(qty), border=1, align='C')
+        pdf.cell(25, 8, str(rate), border=1, align='C')
+        pdf.cell(30, 8, str(amount), border=1, align='C')
         pdf.ln()
     
     pdf.ln(5)
@@ -61,12 +59,12 @@ def generate_invoice(invoice_no, customer_name, address, gstin, state, items, cg
     igst_amount = (total_amount * igst) / 100
     total_after_tax = total_amount + cgst_amount + sgst_amount + igst_amount
     
-    pdf.cell(200, 10, f"Total Before Tax: {total_amount}", ln=True)
-    pdf.cell(200, 10, f"CGST ({cgst}%): {cgst_amount}", ln=True)
-    pdf.cell(200, 10, f"SGST ({sgst}%): {sgst_amount}", ln=True)
-    pdf.cell(200, 10, f"IGST ({igst}%): {igst_amount}", ln=True)
-    pdf.cell(200, 10, f"Total After Tax: {total_after_tax}", ln=True)
-    pdf.cell(200, 10, f"Total in Words: {num2words(total_after_tax).capitalize()} only", ln=True)
+    pdf.cell(190, 7, f"Total Before Tax: {total_amount:.2f}", ln=True)
+    pdf.cell(190, 7, f"CGST ({cgst}%): {cgst_amount:.2f}", ln=True)
+    pdf.cell(190, 7, f"SGST ({sgst}%): {sgst_amount:.2f}", ln=True)
+    pdf.cell(190, 7, f"IGST ({igst}%): {igst_amount:.2f}", ln=True)
+    pdf.cell(190, 7, f"Total After Tax: {total_after_tax:.2f}", ln=True)
+    pdf.cell(190, 7, f"Total in Words: {num2words(total_after_tax, to='currency', lang='en_IN')} only", ln=True)
     
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     pdf.output(temp_file.name)
@@ -75,7 +73,7 @@ def generate_invoice(invoice_no, customer_name, address, gstin, state, items, cg
 st.title("Billing App - Priti Enterprises")
 
 invoice_no = st.text_input("Invoice Number")
-st.session_state['invoice_date'] = st.date_input("Invoice Date")
+invoice_date = st.date_input("Invoice Date", value=datetime.date.today())
 customer_name = st.text_input("Customer Name")
 address = st.text_area("Customer Address")
 gstin = st.text_input("GSTIN")
@@ -97,7 +95,7 @@ for i in range(num_items):
 
 if st.button("Generate Invoice"):
     if customer_name and all(item[0] for item in items):
-        pdf_path = generate_invoice(invoice_no, customer_name, address, gstin, state, items, cgst, sgst, igst)
+        pdf_path = generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, items, cgst, sgst, igst)
         with open(pdf_path, "rb") as file:
             st.download_button("Download Invoice", file, file_name="invoice.pdf", mime="application/pdf")
         os.unlink(pdf_path)
