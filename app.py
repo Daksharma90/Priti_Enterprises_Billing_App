@@ -16,10 +16,10 @@ def generate_invoice(data):
     pdf.ln(5)
     
     # Invoice Details
-    pdf.cell(100, 6, f"Invoice No: {data.get('invoice_no', 'N/A')}")
-    pdf.cell(100, 6, f"Invoice Date: {data.get('invoice_date', 'N/A')}", ln=True)
+    pdf.cell(100, 6, f"Invoice No: {data['invoice_no']}")
+    pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
     pdf.cell(100, 6, f"State: Haryana  State Code: 06")
-    pdf.cell(100, 6, f"Reverse Charge: {data.get('reverse_charge', 'N')}", ln=True)
+    pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
     pdf.ln(5)
     
     # Billed To
@@ -27,14 +27,14 @@ def generate_invoice(data):
     pdf.cell(100, 6, "Billed To:")
     pdf.cell(100, 6, "Shipped To:", ln=True)
     pdf.set_font("Arial", "", 10)
-    pdf.cell(100, 6, f"Name: {data.get('billed_to_name', 'N/A')}")
-    pdf.cell(100, 6, f"Name: {data.get('shipped_to_name', 'N/A')}", ln=True)
-    pdf.cell(100, 6, f"GSTIN: {data.get('billed_to_gstin', 'N/A')}")
-    pdf.cell(100, 6, f"GSTIN: {data.get('shipped_to_gstin', 'N/A')}", ln=True)
-    pdf.cell(100, 6, f"Address: {data.get('billed_to_address', 'N/A')}")
-    pdf.cell(100, 6, f"Address: {data.get('shipped_to_address', 'N/A')}", ln=True)
-    pdf.cell(100, 6, f"State: {data.get('billed_to_state', 'N/A')}")
-    pdf.cell(100, 6, f"State: {data.get('shipped_to_state', 'N/A')}", ln=True)
+    pdf.cell(100, 6, f"Name: {data['billed_to_name']}")
+    pdf.cell(100, 6, f"Name: {data['shipped_to_name']}", ln=True)
+    pdf.cell(100, 6, f"GSTIN: {data['billed_to_gstin']}")
+    pdf.cell(100, 6, f"GSTIN: {data['shipped_to_gstin']}", ln=True)
+    pdf.cell(100, 6, f"Address: {data['billed_to_address']}")
+    pdf.cell(100, 6, f"Address: {data['shipped_to_address']}", ln=True)
+    pdf.cell(100, 6, f"State: {data['billed_to_state']}")
+    pdf.cell(100, 6, f"State: {data['shipped_to_state']}", ln=True)
     pdf.ln(5)
     
     # Table Header
@@ -49,7 +49,7 @@ def generate_invoice(data):
     # Table Data
     pdf.set_font("Arial", "", 10)
     total = 0
-    for i, product in enumerate(data.get('products', [])):
+    for i, product in enumerate(data['products']):
         amount = round(product['qty'] * product['rate'], 2)
         total += amount
         pdf.cell(10, 6, str(i+1), border=1)
@@ -61,10 +61,10 @@ def generate_invoice(data):
     
     pdf.ln(5)
 
-    # Tax Calculation
-    cgst = round(total * (data.get("cgst_rate", 0) / 100), 2)
-    sgst = round(total * (data.get("sgst_rate", 0) / 100), 2)
-    igst = round(total * (data.get("igst_rate", 0) / 100), 2)
+    # Tax Calculation (User input CGST, SGST, IGST)
+    cgst = round(total * (data['cgst_rate'] / 100), 2)
+    sgst = round(total * (data['sgst_rate'] / 100), 2)
+    igst = round(total * (data['igst_rate'] / 100), 2)
     total_after_tax = round(total + cgst + sgst + igst, 2)
 
     # Convert total amount to words
@@ -74,13 +74,13 @@ def generate_invoice(data):
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
     
-    pdf.cell(145, 6, f"CGST ({data.get('cgst_rate', 0)}%):", border=0, align='R')
+    pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
     
-    pdf.cell(145, 6, f"SGST ({data.get('sgst_rate', 0)}%):", border=0, align='R')
+    pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
 
-    pdf.cell(145, 6, f"IGST ({data.get('igst_rate', 0)}%):", border=0, align='R')
+    pdf.cell(145, 6, f"IGST ({data['igst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
     
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
@@ -89,6 +89,13 @@ def generate_invoice(data):
     # Display total amount in words
     pdf.ln(5)
     pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
+
+    # Footer Section
+    pdf.ln(20)  
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(200, 6, "For PRITI ENTERPRISES", ln=True, align='R')
+    pdf.ln(15)
+    pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
 
     return pdf.output(dest='S').encode('latin1')
 
@@ -111,10 +118,10 @@ shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
 
-# Tax Inputs
-cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, format="%.2f")
-sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, format="%.2f")
-igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, format="%.2f")
+# Tax Rates (User Input)
+cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
+sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
+igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
 
 # Product Details
 st.subheader("Products / Services")
@@ -129,6 +136,6 @@ for i in range(n):
     products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
-    invoice_data = locals()  # Collects all defined variables
+    invoice_data = locals()
     pdf = generate_invoice(invoice_data)
     st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
