@@ -7,7 +7,7 @@ import datetime
 
 def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, items, cgst, sgst, igst):
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=10)
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     
     pdf.set_font("Arial", "B", 16)
@@ -43,11 +43,12 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     
     pdf.set_font("Arial", "B", 11)
     pdf.cell(10, 8, "S.No", border=1, align='C')
-    pdf.cell(60, 8, "Product Name", border=1, align='C')
-    pdf.cell(25, 8, "HSN/SAC", border=1, align='C')
-    pdf.cell(20, 8, "Qty", border=1, align='C')
-    pdf.cell(25, 8, "Rate", border=1, align='C')
-    pdf.cell(30, 8, "Amount", border=1, align='C')
+    pdf.cell(50, 8, "Product Name", border=1, align='C')
+    pdf.cell(20, 8, "HSN/SAC", border=1, align='C')
+    pdf.cell(15, 8, "Qty", border=1, align='C')
+    pdf.cell(20, 8, "Rate", border=1, align='C')
+    pdf.cell(25, 8, "Amount", border=1, align='C')
+    pdf.cell(25, 8, "GST Payable RCM", border=1, align='C')
     pdf.ln()
     
     total_amount = 0
@@ -56,11 +57,12 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
         amount = int(qty) * float(rate)
         total_amount += amount
         pdf.cell(10, 8, str(i), border=1, align='C')
-        pdf.cell(60, 8, name, border=1, align='L')
-        pdf.cell(25, 8, hsn, border=1, align='C')
-        pdf.cell(20, 8, str(qty), border=1, align='C')
-        pdf.cell(25, 8, str(rate), border=1, align='C')
-        pdf.cell(30, 8, str(amount), border=1, align='C')
+        pdf.cell(50, 8, name, border=1, align='L')
+        pdf.cell(20, 8, hsn, border=1, align='C')
+        pdf.cell(15, 8, str(qty), border=1, align='C')
+        pdf.cell(20, 8, str(rate), border=1, align='C')
+        pdf.cell(25, 8, str(amount), border=1, align='C')
+        pdf.cell(25, 8, "No", border=1, align='C')
         pdf.ln()
     
     pdf.ln(5)
@@ -77,20 +79,15 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     pdf.cell(70, 7, f"{sgst_amount:.2f}", align='R', ln=True)
     pdf.cell(120, 7, f"IGST ({igst}%):", align='L')
     pdf.cell(70, 7, f"{igst_amount:.2f}", align='R', ln=True)
-    pdf.cell(120, 7, "Total After Tax:", align='L')
-    pdf.cell(70, 7, f"{total_after_tax:.2f}", align='R', ln=True)
-    pdf.cell(190, 7, f"Total in Words: {num2words(total_after_tax, to='currency', lang='en')} only", ln=True)
+    pdf.cell(190, 7, f"Total in Words: {num2words(total_after_tax, lang='en_IN')} Rupees only", ln=True)
     
     pdf.ln(10)
-    pdf.cell(190, 7, "E-Way Bill No: {eway_bill}", ln=True)
+    pdf.cell(190, 7, f"E-Way Bill No: {eway_bill}", ln=True)
     pdf.ln(5)
-    pdf.cell(190, 7, "Bank Details: Priti Enterprises", ln=True)
-    pdf.cell(190, 7, "Bank Name: Punjab National Bank", ln=True)
+    pdf.cell(190, 7, "Bank Details: Punjab National Bank", ln=True)
     pdf.cell(190, 7, "A/c No.: 005308700006153", ln=True)
     pdf.cell(190, 7, "IFSC Code: PUNB0005300", ln=True)
-    pdf.cell(190, 7, "GST Payable on Reverse Charge: No", ln=True)
-    
-    pdf.ln(15)
+    pdf.ln(10)
     pdf.cell(95, 7, "Authorized Signature", ln=True, align='L')
     
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=f"invoice_{invoice_no}.pdf")
