@@ -113,9 +113,6 @@ def generate_invoice(data):
     
     return pdf.output(dest='S').encode('latin1')
 
-
-    return pdf.output(dest='S').encode('latin1')
-
 st.title("Invoice Generator")
 
 # Invoice Details
