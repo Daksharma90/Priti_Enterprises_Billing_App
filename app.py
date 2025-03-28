@@ -102,11 +102,13 @@ reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
+billed_to_gstin = st.text_input("Billed To - GSTIN")
 billed_to_address = st.text_area("Billed To - Address")
 billed_to_state = st.text_input("Billed To - State")
 
 # Shipped To
 shipped_to_name = st.text_input("Shipped To - Name")
+shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
 
