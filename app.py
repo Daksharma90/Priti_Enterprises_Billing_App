@@ -9,129 +9,142 @@ def generate_invoice(data):
     pdf.add_page()
     pdf.set_font("Arial", "B", 12)
 
-    # Header
-    pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
-    pdf.cell(50, 10, "GSTIN: 06APGPK2323H1Z8", align='L')
-
-    pdf.set_font("Arial", "B", 20)  # Bigger font for PRITI ENTERPRISES
-    pdf.cell(100, 10, "PRITI ENTERPRISES", align='C')
-
-    pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
-    pdf.cell(50, 10, "Mobile: 9416083098, 9813269838", align='R', ln=True)
-
+    # 1. Invoice Header (Company Information)
+    pdf.set_font("Arial", "B", 20)
+    pdf.cell(0, 10, "PRITI ENTERPRISES", align='C', ln=True)  # Prominent Company Name
     pdf.set_font("Arial", "", 10)
-    pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
-    pdf.ln(5)
-
-    # Invoice Details
-    pdf.cell(100, 6, f"Invoice No: {data['invoice_no']}")
-    pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
-    pdf.cell(100, 6, f"State: Haryana State Code: 06")
-    pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
-    pdf.ln(5)
-
-    # Billed To
+    pdf.cell(0, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", align='C', ln=True)
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(100, 6, "Billed To:")
-    pdf.cell(100, 6, "Shipped To:", ln=True)
+    pdf.cell(60, 5, f"GSTIN: 06APGPK2323H1Z8", ln=False)
+    pdf.cell(0, 5, f"Mobile: 9416083098, 9813269838", ln=True, align='R')
+    pdf.ln(5)
+
+    # 2. Recipient Details (Billed To / Shipped To)
+    pdf.set_fill_color(240, 240, 240)  # Light gray background
+    pdf.set_line_width(0.1)
+    pdf.rect(10, pdf.y, 90, 40, 'DF')  # Box around Billed To
+    pdf.rect(110, pdf.y, 90, 40, 'DF') # Box around Shipped To
+    pdf.set_font("Arial", "B", 10)
+    pdf.text(12, pdf.y + 5, "Billed To:")
+    pdf.text(112, pdf.y + 5, "Shipped To:")
     pdf.set_font("Arial", "", 10)
-    pdf.cell(100, 6, f"Name: {data['billed_to_name']}")
-    pdf.cell(100, 6, f"Name: {data['shipped_to_name']}", ln=True)
-    pdf.cell(100, 6, f"GSTIN: {data['billed_to_gstin']}")
-    pdf.cell(100, 6, f"GSTIN: {data['shipped_to_gstin']}", ln=True)
-    pdf.cell(100, 6, f"Address: {data['billed_to_address']}")
-    pdf.cell(100, 6, f"Address: {data['shipped_to_address']}", ln=True)
-    pdf.cell(100, 6, f"State: {data['billed_to_state']}")
-    pdf.cell(100, 6, f"State: {data['shipped_to_state']}", ln=True)
-    pdf.ln(5)
+    pdf.text(12, pdf.y + 12, f"Name: {data['billed_to_name']}")
+    pdf.text(112, pdf.y + 12, f"Name: {data['shipped_to_name']}")
+    pdf.text(12, pdf.y + 20, f"Address: {data['billed_to_address']}")
+    pdf.text(112, pdf.y + 20, f"Address: {data['shipped_to_address']}")
+    pdf.text(12, pdf.y + 28, f"GSTIN: {data['billed_to_gstin']}")
+    pdf.text(112, pdf.y + 28, f"GSTIN: {data['shipped_to_gstin']}")
+    pdf.text(12, pdf.y + 36, f"State: {data['billed_to_state']}")
+    pdf.text(112, pdf.y + 36, f"State: {data['shipped_to_state']}")
+    pdf.ln(45)
 
-    # Transportation Details
+    # 3. Invoice Details (Invoice No, Date, etc.)
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(100, 6, "Transportation Details:", ln=True)
+    pdf.cell(40, 6, "Invoice No:", border=1)
     pdf.set_font("Arial", "", 10)
-    pdf.cell(100, 6, f"Transportation Mode: {data['transportation_mode']}", ln=True)
-    pdf.cell(100, 6, f"Vehicle Number: {data['vehicle_number']}", ln=True)
-    pdf.cell(100, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
-    pdf.cell(100, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
-    pdf.cell(100, 6, f"E-Way Bill No: {data['eway_bill_number']}", ln=True)  # Integrated E-Way Bill
+    pdf.cell(50, 6, data['invoice_no'], border=1)
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(40, 6, "Invoice Date:", border=1)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(0, 6, data['invoice_date'], border=1, ln=True)
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(40, 6, "Reverse Charge:", border=1)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(50, 6, data['reverse_charge'], border=1)
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(40, 6, "State & Code:", border=1)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(0, 6, "Haryana 06", border=1, ln=True)
     pdf.ln(5)
 
-    # Table Header
+    # 4. Product/Service Details (Table)
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(10, 6, "Sr.", border=1)
-    pdf.cell(80, 6, "Product / Service", border=1)
-    pdf.cell(20, 6, "HSN/SAC", border=1)
-    pdf.cell(15, 6, "Qty", border=1)
-    pdf.cell(20, 6, "Rate", border=1)
-    pdf.cell(30, 6, "Amount", border=1, ln=True)
+    pdf.cell(10, 8, "Sr.", border=1, align='C')
+    pdf.cell(80, 8, "Product / Service", border=1, align='C')
+    pdf.cell(20, 8, "HSN/SAC", border=1, align='C')
+    pdf.cell(15, 8, "Qty", border=1, align='C')
+    pdf.cell(20, 8, "Rate", border=1, align='C')
+    pdf.cell(30, 8, "Amount", border=1, align='C', ln=True)
 
-    # Table Data
     pdf.set_font("Arial", "", 10)
     total = 0
     for i, product in enumerate(data['products']):
         amount = round(product['qty'] * product['rate'], 2)
         total += amount
-        pdf.cell(10, 6, str(i + 1), border=1)
+        pdf.cell(10, 6, str(i + 1), border=1, align='C')
         pdf.cell(80, 6, product['name'], border=1)
-        pdf.cell(20, 6, product['hsn_sac'], border=1)
-        pdf.cell(15, 6, str(product['qty']), border=1)
-        pdf.cell(20, 6, f"{product['rate']:.2f}", border=1)
-        pdf.cell(30, 6, f"{amount:.2f}", border=1, ln=True)
-
+        pdf.cell(20, 6, product['hsn_sac'], border=1, align='C')
+        pdf.cell(15, 6, str(product['qty']), border=1, align='C')
+        pdf.cell(20, 6, f"{product['rate']:.2f}", border=1, align='R')
+        pdf.cell(30, 6, f"{amount:.2f}", border=1, align='R', ln=True)
     pdf.ln(5)
 
-    # Tax Calculation (User input CGST, SGST, IGST)
+    # 5. Tax Calculation
+    pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
+    pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
+
     cgst = round(total * (data['cgst_rate'] / 100), 2)
     sgst = round(total * (data['sgst_rate'] / 100), 2)
     igst = round(total * (data['igst_rate'] / 100), 2)
     total_after_tax = round(total + cgst + sgst + igst, 2)
 
-    # Convert total amount to words
-    total_in_words = num2words(total_after_tax, lang='en').capitalize() + " only"
+    if cgst > 0:
+        pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%)", border=0, align='R')
+        pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
+    if sgst > 0:
+        pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%)", border=0, align='R')
+        pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
+    if igst > 0:
+        pdf.cell(145, 6, f"IGST ({data['igst_rate']}%)", border=0, align='R')
+        pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
 
-    # Right-Aligned Totals
-    pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
-    pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
-
-    pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%):", border=0, align='R')
-    pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
-
-    pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%):", border=0, align='R')
-    pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
-
-    pdf.cell(145, 6, f"IGST ({data['igst_rate']}%):", border=0, align='R')
-    pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
-
+    pdf.set_font("Arial", "B", 10)
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
-
-    # Display total amount in words
-    pdf.ln(5)
-    pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
-
-    # Footer Section
-    pdf.ln(20)
-    # Bank Details
-    pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "Bank Details:", ln=True)
     pdf.set_font("Arial", "", 10)
-    pdf.cell(200, 6, "Bank Name: Punjab National Bank", ln=True)
-    pdf.cell(200, 6, "Account No.: 005308700006153", ln=True)
-    pdf.cell(200, 6, "IFSC Code: PUNB0005300", ln=True)
-    pdf.ln(10)
+    pdf.ln(5)
 
-    # Terms & Conditions
+    # 6. Amount in Words
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "Terms & Conditions:", ln=True)
-    pdf.set_font("Arial", "", 8)
-    pdf.multi_cell(200, 5, "1. Goods once sold will not be taken back.\n2. Interest @18% p.a. will be charged if payment is not made in stipulated time.\n3. Subject to BHIWANI Jurisdiction Only.")
+    pdf.cell(0, 6, "Amount in Words:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(0, 6, num2words(total_after_tax, lang='en').capitalize() + " only", ln=True)
+    pdf.ln(5)
 
-    pdf.ln(10)
-    pdf.cell(200, 6, "For: PRITI ENTERPRISES", ln=True, align='R')
-    pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
+    # 7. Transportation Details
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(0, 6, "Transportation Details", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(0, 6, f"Transportation Mode: {data['transportation_mode']}", ln=True)
+    pdf.cell(0, 6, f"Vehicle Number: {data['vehicle_number']}", ln=True)
+    pdf.cell(0, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
+    pdf.cell(0, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
+    pdf.cell(0, 6, f"E-Way Bill No: {data['eway_bill_number']}", ln=True)
+    pdf.ln(5)
+
+    # 8. Footer (Bank Details, Terms & Conditions)
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(0, 6, "Bank Details:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(0, 6, "Bank Name: Punjab National Bank", ln=True)
+    pdf.cell(0, 6, "Account No.: 005308700006153", ln=True)
+    pdf.cell(0, 6, "IFSC Code: PUNB0005300", ln=True)
+    pdf.ln(5)
+
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(0, 6, "Terms & Conditions:", ln=True)
+    pdf.set_font("Arial", "", 8)
+    pdf.cell(0, 5, "1. Goods once sold will not be taken back.", ln=True)
+    pdf.cell(0, 5, "2. Interest @18% p.a. will be charged if payment is not made in stipulated time.", ln=True)
+    pdf.cell(0, 5, "3. Subject to BHIWANI Jurisdiction Only.", ln=True)
+    pdf.ln(5)
+
+    pdf.cell(0, 5, "For: PRITI ENTERPRISES", ln=True, align='R')
+    pdf.cell(0, 5, "Authorized Signatory", align='R')
 
     return pdf.output(dest='S').encode('latin1')
 
+# Streamlit UI (Remains largely the same)
 st.title("Invoice Generator")
 
 # Invoice Details
