@@ -59,16 +59,24 @@ def generate_invoice(data):
         pdf.cell(30, 6, str(amount), border=1, ln=True)
     
     pdf.ln(5)
+
+    # Tax Calculation
+    cgst = round(total * 0.09, 2)
+    sgst = round(total * 0.09, 2)
+    total_after_tax = round(total + cgst + sgst, 2)
+
+    # Right-Aligned Totals
+    pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
+    pdf.cell(30, 6, str(total), border=1, ln=True)
     
-    # Total Calculation
-    pdf.cell(100, 6, "Total Amount Before Tax:")
-    pdf.cell(50, 6, str(total), ln=True)
-    pdf.cell(100, 6, "CGST (9%):")
-    pdf.cell(50, 6, str(round(total * 0.09, 2)), ln=True)
-    pdf.cell(100, 6, "SGST (9%):")
-    pdf.cell(50, 6, str(round(total * 0.09, 2)), ln=True)
-    pdf.cell(100, 6, "Total Amount After Tax:")
-    pdf.cell(50, 6, str(round(total * 1.18, 2)), ln=True)
+    pdf.cell(145, 6, "CGST (9%):", border=0, align='R')
+    pdf.cell(30, 6, str(cgst), border=1, ln=True)
+    
+    pdf.cell(145, 6, "SGST (9%):", border=0, align='R')
+    pdf.cell(30, 6, str(sgst), border=1, ln=True)
+    
+    pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
+    pdf.cell(30, 6, str(total_after_tax), border=1, ln=True)
     
     pdf.ln(10)
     
