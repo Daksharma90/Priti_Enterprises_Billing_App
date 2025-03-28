@@ -118,10 +118,10 @@ products = []
 n = st.number_input("Number of Products", min_value=1, step=1)
 for i in range(n):
     st.write(f"### Product {i+1}")
-    name = st.text_input(f"Product {i+1} Name")
-    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code")
-    qty = st.number_input(f"Product {i+1} Quantity", min_value=1)
-    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f")
+    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
+    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
+    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
+    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
     products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
@@ -130,9 +130,11 @@ if st.button("Generate Invoice"):
         "invoice_date": invoice_date,
         "reverse_charge": reverse_charge,
         "billed_to_name": billed_to_name,
+        "billed_to_gstin": billed_to_gstin,
         "billed_to_address": billed_to_address,
         "billed_to_state": billed_to_state,
         "shipped_to_name": shipped_to_name,
+        "shipped_to_gstin": shipped_to_gstin,
         "shipped_to_address": shipped_to_address,
         "shipped_to_state": shipped_to_state,
         "products": products
