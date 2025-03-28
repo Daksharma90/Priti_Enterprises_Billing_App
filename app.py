@@ -1,6 +1,7 @@
 import streamlit as st
 from fpdf import FPDF
 import datetime
+from num2words import num2words  # Added for amount in words
 
 def generate_invoice(data):
     pdf = FPDF()
@@ -65,6 +66,9 @@ def generate_invoice(data):
     sgst = round(total * 0.09, 2)
     total_after_tax = round(total + cgst + sgst, 2)
 
+    # Convert total amount to words
+    total_in_words = num2words(total_after_tax, lang='en').capitalize() + " only"
+
     # Right-Aligned Totals
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
@@ -78,6 +82,10 @@ def generate_invoice(data):
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
     
+    # Display total amount in words
+    pdf.ln(5)
+    pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
+
     pdf.ln(10)
     
     # Bank Details
