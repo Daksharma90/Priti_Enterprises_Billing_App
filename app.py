@@ -35,14 +35,19 @@ def generate_invoice(data):
     # Calculate available height for address
     address_height = 23  # Maximum height available for address
     pdf.set_x(12)
-    pdf.set_y(pdf.y + 7)
+    pdf.set_y(pdf.y + 17) # Increased initial y offset
+
     pdf.multi_cell(86, 5, f"Address: {data['billed_to_address']}", border=0, max_line_height=5)
 
+    billed_address_height = pdf.y - pdf.get_y()
+    pdf.set_y(17 + billed_address_height)
+
     pdf.set_x(112)
-    pdf.set_y(pdf.y - pdf.get_string_height(data['billed_to_address'], 86, 10) + 7)
+    pdf.set_y(pdf.y - pdf.get_string_height(data['shipped_to_address'], 86, 10) - billed_address_height)
     pdf.multi_cell(86, 5, f"Address: {data['shipped_to_address']}", border=0, max_line_height=5)
 
-    pdf.set_y(pdf.y + pdf.get_string_height(data['shipped_to_address'], 86, 10) - 5)
+    shipped_address_height = pdf.y - pdf.get_y()
+    pdf.set_y(17 + max(billed_address_height, shipped_address_height) + 20)  # Adjust y after both addresses
 
     pdf.set_x(12)
     pdf.cell(86, 5, f"GSTIN: {data['billed_to_gstin']}", border=0)
