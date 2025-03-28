@@ -31,13 +31,31 @@ def generate_invoice(data):
     pdf.set_font("Arial", "", 10)
     pdf.text(12, pdf.y + 12, f"Name: {data['billed_to_name']}")
     pdf.text(112, pdf.y + 12, f"Name: {data['shipped_to_name']}")
-    pdf.text(12, pdf.y + 20, f"Address: {data['billed_to_address']}")
-    pdf.text(112, pdf.y + 20, f"Address: {data['shipped_to_address']}")
-    pdf.text(12, pdf.y + 28, f"GSTIN: {data['billed_to_gstin']}")
-    pdf.text(112, pdf.y + 28, f"GSTIN: {data['shipped_to_gstin']}")
-    pdf.text(12, pdf.y + 36, f"State: {data['billed_to_state']}")
-    pdf.text(112, pdf.y + 36, f"State: {data['shipped_to_state']}")
-    pdf.ln(45)
+
+    # Address with multi-line support and fixed height
+    address_line_height = 5  # Height for each line of address
+    address_y_start = pdf.y + 20
+    pdf.set_xy(12, address_y_start)
+    pdf.multi_cell(86, address_line_height, f"Address: {data['billed_to_address']}", border=0, max_line_height=address_line_height)
+
+    pdf.set_xy(112, address_y_start)
+    pdf.multi_cell(86, address_line_height, f"Address: {data['shipped_to_address']}", border=0, max_line_height=address_line_height)
+
+    # GSTIN and State
+    gstin_y = address_y_start + 3 * address_line_height  # Position after 3 address rows
+    state_y = gstin_y + 8 # Position State after GSTIN
+
+    pdf.set_xy(12, gstin_y)
+    pdf.cell(86, 6, f"GSTIN: {data['billed_to_gstin']}", border=0)
+    pdf.set_xy(112, gstin_y)
+    pdf.cell(86, 6, f"GSTIN: {data['shipped_to_gstin']}", border=0)
+
+    pdf.set_xy(12, state_y)
+    pdf.cell(86, 6, f"State: {data['billed_to_state']}")
+    pdf.set_xy(112, state_y)
+    pdf.cell(86, 6, f"State: {data['shipped_to_state']}")
+
+    pdf.ln(state_y - pdf.y + 10) # Adjust line break after state
 
     # 3. Invoice Details (Invoice No, Date, etc.)
     pdf.set_font("Arial", "B", 10)
