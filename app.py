@@ -9,8 +9,15 @@ def generate_invoice(data):
     pdf.add_page()
     pdf.set_font("Arial", "B", 12)
     
-    # Header
+     # Header
     pdf.cell(200, 10, "PRITI ENTERPRISES", ln=True, align='C')
+    
+    # GST and Mobile Numbers
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(200, 6, "GSTIN: 06APGPK2323H1Z8", ln=False, align='L')  # Added GST Number
+    pdf.cell(200, 6, "Mobile: 9416083098, 9813269838", ln=True, align='R')  # Added Mobile Numbers
+    
+    # Address
     pdf.set_font("Arial", "", 10)
     pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
     pdf.ln(5)
