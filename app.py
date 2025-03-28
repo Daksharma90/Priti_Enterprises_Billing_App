@@ -112,15 +112,24 @@ def generate_invoice(data):
     pdf.cell(0, 6, num2words(total_after_tax, lang='en').capitalize() + " only", ln=True)
     pdf.ln(5)
 
-    # 7. Transportation Details
+    # 7. Transportation Details (Tabular Format)
     pdf.set_font("Arial", "B", 10)
     pdf.cell(0, 6, "Transportation Details", ln=True)
+
+    # Table Headers
+    pdf.cell(40, 6, "Transportation Mode", border=1)
+    pdf.cell(40, 6, "Vehicle Number", border=1)
+    pdf.cell(40, 6, "Date of Supply", border=1)
+    pdf.cell(40, 6, "Place of Supply", border=1)
+    pdf.cell(40, 6, "E-Way Bill No", border=1, ln=True)
+
+    # Table Data
     pdf.set_font("Arial", "", 10)
-    pdf.cell(0, 6, f"Transportation Mode: {data['transportation_mode']}", ln=True)
-    pdf.cell(0, 6, f"Vehicle Number: {data['vehicle_number']}", ln=True)
-    pdf.cell(0, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
-    pdf.cell(0, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
-    pdf.cell(0, 6, f"E-Way Bill No: {data['eway_bill_number']}", ln=True)
+    pdf.cell(40, 6, data['transportation_mode'], border=1)
+    pdf.cell(40, 6, data['vehicle_number'], border=1)
+    pdf.cell(40, 6, data['date_of_supply'], border=1)
+    pdf.cell(40, 6, data['place_of_supply'], border=1)
+    pdf.cell(40, 6, data['eway_bill_number'], border=1, ln=True)
     pdf.ln(5)
 
     # 8. Footer (Bank Details, Terms & Conditions)
