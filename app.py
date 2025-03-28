@@ -106,7 +106,7 @@ st.title("Invoice Generator")
 # Invoice Details
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
-reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
+reverse_charge = st.selectbox("Reverse Charge", ["Yes", "No"])
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
