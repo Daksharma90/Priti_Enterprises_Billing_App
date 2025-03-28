@@ -7,19 +7,18 @@ def generate_invoice(data):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Arial", "B", 12)
     
-    # Header
-    pdf.cell(200, 10, "PRITI ENTERPRISES", ln=True, align='C')
-    
-    # GST and Mobile Numbers
+    # GST & Mobile Number on Top
     pdf.set_font("Arial", "B", 10)
-    pdf.cell(200, 6, "GSTIN: 06APGPK2323H1Z8", ln=True, align='C')  # Added GST Number
-    pdf.cell(200, 6, "Mobile: 9416083098, 9813269838", ln=True, align='C')  # Added Mobile Numbers
-    
-    # Address
+    pdf.cell(100, 6, "GST No: 06APGPK2323H1Z8", ln=False)  
+    pdf.cell(100, 6, "Mobile: 9416083098, 9813269838", ln=True, align='R')  
+    pdf.ln(2)
+
+    # Company Name and Address
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(200, 10, "PRITI ENTERPRISES", ln=True, align='C')
     pdf.set_font("Arial", "", 10)
-    pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
+    pdf.cell(200, 5, "Near Santu Tubewell, Tosham Road Bypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
     pdf.ln(5)
     
     # Invoice Details
@@ -68,7 +67,7 @@ def generate_invoice(data):
     
     pdf.ln(5)
 
-    # Tax Calculation (User input CGST, SGST, IGST)
+    # Tax Calculation
     cgst = round(total * (data['cgst_rate'] / 100), 2)
     sgst = round(total * (data['sgst_rate'] / 100), 2)
     igst = round(total * (data['igst_rate'] / 100), 2)
@@ -93,13 +92,14 @@ def generate_invoice(data):
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
     
-    # Display total amount in words
+    # Total in Words
     pdf.ln(5)
     pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
 
     # Footer Section
-    pdf.ln(20)  
-     # Bank Details
+    pdf.ln(20)
+    
+    # Bank Details
     pdf.set_font("Arial", "B", 10)
     pdf.cell(200, 6, "Bank Details:", ln=True)
     pdf.set_font("Arial", "", 10)
@@ -121,34 +121,17 @@ def generate_invoice(data):
     return pdf.output(dest='S').encode('latin1')
 
 st.title("Invoice Generator")
-# Invoice Details
+
+# Invoice Input Fields
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
 reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
-# Billed To
-billed_to_name = st.text_input("Billed To - Name")
-billed_to_gstin = st.text_input("Billed To - GSTIN")
-billed_to_address = st.text_area("Billed To - Address")
-billed_to_state = st.text_input("Billed To - State")
-
-# Shipped To
-shipped_to_name = st.text_input("Shipped To - Name")
-shipped_to_gstin = st.text_input("Shipped To - GSTIN")
-shipped_to_address = st.text_area("Shipped To - Address")
-shipped_to_state = st.text_input("Shipped To - State")
-
-# Tax Rates (User Input)
-cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-sgst_rate = st.number_input("SGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-igst_rate = st.number_input("IGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
-
-# Product Details
+# User Inputs for Products
 st.subheader("Products / Services")
 products = []
 n = st.number_input("Number of Products", min_value=1, step=1)
 for i in range(n):
-    st.write(f"### Product {i+1}")
     name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
     hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
     qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
