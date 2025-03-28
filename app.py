@@ -8,7 +8,7 @@ def generate_invoice(data):
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Arial", "B", 12)
-    
+
     # Header
     pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
     pdf.cell(50, 10, "GSTIN: 06APGPK2323H1Z8", align='L')
@@ -23,14 +23,13 @@ def generate_invoice(data):
     pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
     pdf.ln(5)
 
-    
     # Invoice Details
     pdf.cell(100, 6, f"Invoice No: {data['invoice_no']}")
     pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
     pdf.cell(100, 6, f"State: Haryana State Code: 06")
     pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
     pdf.ln(5)
-    
+
     # Billed To
     pdf.set_font("Arial", "B", 10)
     pdf.cell(100, 6, "Billed To:")
@@ -55,7 +54,7 @@ def generate_invoice(data):
     pdf.cell(100, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
     pdf.cell(100, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
     pdf.ln(5)
-    
+
     # Table Header
     pdf.set_font("Arial", "B", 10)
     pdf.cell(10, 6, "Sr.", border=1)
@@ -64,20 +63,20 @@ def generate_invoice(data):
     pdf.cell(15, 6, "Qty", border=1)
     pdf.cell(20, 6, "Rate", border=1)
     pdf.cell(30, 6, "Amount", border=1, ln=True)
-    
+
     # Table Data
     pdf.set_font("Arial", "", 10)
     total = 0
     for i, product in enumerate(data['products']):
         amount = round(product['qty'] * product['rate'], 2)
         total += amount
-        pdf.cell(10, 6, str(i+1), border=1)
+        pdf.cell(10, 6, str(i + 1), border=1)
         pdf.cell(80, 6, product['name'], border=1)
         pdf.cell(20, 6, product['hsn_sac'], border=1)
         pdf.cell(15, 6, str(product['qty']), border=1)
         pdf.cell(20, 6, f"{product['rate']:.2f}", border=1)
         pdf.cell(30, 6, f"{amount:.2f}", border=1, ln=True)
-    
+
     pdf.ln(5)
 
     # Tax Calculation (User input CGST, SGST, IGST)
@@ -92,25 +91,25 @@ def generate_invoice(data):
     # Right-Aligned Totals
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
-    
+
     pdf.cell(145, 6, f"CGST ({data['cgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
-    
+
     pdf.cell(145, 6, f"SGST ({data['sgst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
 
     pdf.cell(145, 6, f"IGST ({data['igst_rate']}%):", border=0, align='R')
     pdf.cell(30, 6, f"{igst:.2f}", border=1, ln=True)
-    
+
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
     pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
-    
+
     # Display total amount in words
     pdf.ln(5)
     pdf.cell(200, 6, f"Total Amount (In Words): {total_in_words}", ln=True)
 
     # Footer Section
-    pdf.ln(20)  
+    pdf.ln(20)
     # Bank Details
     pdf.set_font("Arial", "B", 10)
     pdf.cell(200, 6, "Bank Details:", ln=True)
@@ -119,17 +118,17 @@ def generate_invoice(data):
     pdf.cell(200, 6, "Account No.: 005308700006153", ln=True)
     pdf.cell(200, 6, "IFSC Code: PUNB0005300", ln=True)
     pdf.ln(10)
-    
+
     # Terms & Conditions
     pdf.set_font("Arial", "B", 10)
     pdf.cell(200, 6, "Terms & Conditions:", ln=True)
     pdf.set_font("Arial", "", 8)
     pdf.multi_cell(200, 5, "1. Goods once sold will not be taken back.\n2. Interest @18% p.a. will be charged if payment is not made in stipulated time.\n3. Subject to BHIWANI Jurisdiction Only.")
-    
+
     pdf.ln(10)
     pdf.cell(200, 6, "For: PRITI ENTERPRISES", ln=True, align='R')
     pdf.cell(200, 6, "Authorized Signatory", ln=True, align='R')
-    
+
     return pdf.output(dest='S').encode('latin1')
 
 st.title("Invoice Generator")
@@ -151,7 +150,7 @@ shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
 
-# Transportation Details  <--- ADDED INPUT FIELDS
+# Transportation Details  <--- INPUT FIELDS
 transportation_mode = st.text_input("Transportation Mode")
 vehicle_number = st.text_input("Vehicle Number")
 date_of_supply = st.date_input("Date of Supply", datetime.date.today()).strftime("%d-%m-%Y")
@@ -177,4 +176,4 @@ for i in range(n):
 if st.button("Generate Invoice"):
     invoice_data = locals()
     pdf = generate_invoice(invoice_data)
-    st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
+    st.download_button("Download Invoice", pdf, "application/pdf")
