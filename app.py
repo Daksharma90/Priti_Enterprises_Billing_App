@@ -31,13 +31,24 @@ def generate_invoice(data):
     pdf.set_font("Arial", "", 10)
     pdf.text(12, pdf.y + 12, f"Name: {data['billed_to_name']}")
     pdf.text(112, pdf.y + 12, f"Name: {data['shipped_to_name']}")
-    pdf.text(12, pdf.y + 20, f"Address: {data['billed_to_address']}")
-    pdf.text(112, pdf.y + 20, f"Address: {data['shipped_to_address']}")
-    pdf.text(12, pdf.y + 28, f"GSTIN: {data['billed_to_gstin']}")
-    pdf.text(112, pdf.y + 28, f"GSTIN: {data['shipped_to_gstin']}")
-    pdf.text(12, pdf.y + 36, f"State: {data['billed_to_state']}")
-    pdf.text(112, pdf.y + 36, f"State: {data['shipped_to_state']}")
-    pdf.ln(45)
+    pdf.set_font("Arial", "", 10)  # Reset font size before multi_cell
+    pdf.ln(7)  # Add some spacing before address
+    pdf.set_x(12)  # Set x position before multi_cell
+    pdf.multi_cell(86, 5, f"Address: {data['billed_to_address']}", border=0)  # Use multi_cell for address
+    pdf.set_x(112)  # Reset x position for shipped to
+    pdf.set_y(pdf.y - pdf.font_size)  # Adjust y position for next element
+    pdf.multi_cell(86, 5, f"Address: {data['shipped_to_address']}", border=0)  # Use multi_cell for address
+    pdf.ln(5)  # Add spacing after address
+    pdf.set_font("Arial", "", 10)  # Reset font size before GSTIN
+    pdf.set_x(12)
+    pdf.cell(86, 5, f"GSTIN: {data['billed_to_gstin']}", border=0)
+    pdf.set_x(112)
+    pdf.cell(86, 5, f"GSTIN: {data['shipped_to_gstin']}", border=0, ln=True)
+    pdf.set_x(12)
+    pdf.cell(86, 5, f"State: {data['billed_to_state']}")
+    pdf.set_x(112)
+    pdf.cell(86, 5, f"State: {data['shipped_to_state']}")
+    pdf.ln(5)
 
     # 3. Invoice Details (Invoice No, Date, etc.)
     pdf.set_font("Arial", "B", 10)
