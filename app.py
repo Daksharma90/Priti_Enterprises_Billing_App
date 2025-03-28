@@ -31,19 +31,19 @@ def generate_invoice(data):
     pdf.set_font("Arial", "", 10)
     pdf.text(12, pdf.y + 12, f"Name: {data['billed_to_name']}")
     pdf.text(112, pdf.y + 12, f"Name: {data['shipped_to_name']}")
+    pdf.set_y(pdf.y + 7)  # Adjust y position before address
     pdf.set_font("Arial", "", 10)  # Reset font size before multi_cell
-    pdf.ln(7)  # Add some spacing before address
     pdf.set_x(12)  # Set x position before multi_cell
     pdf.multi_cell(86, 5, f"Address: {data['billed_to_address']}", border=0)  # Use multi_cell for address
     pdf.set_x(112)  # Reset x position for shipped to
-    pdf.set_y(pdf.y - pdf.font_size)  # Adjust y position for next element
+    pdf.set_y(pdf.y - pdf.font_size * pdf.line_height)  # Adjust y position for next element
     pdf.multi_cell(86, 5, f"Address: {data['shipped_to_address']}", border=0)  # Use multi_cell for address
-    pdf.ln(5)  # Add spacing after address
-    pdf.set_font("Arial", "", 10)  # Reset font size before GSTIN
+    pdf.set_y(pdf.y + (pdf.font_size * pdf.line_height) + 2)  # Adjust y position after address
     pdf.set_x(12)
     pdf.cell(86, 5, f"GSTIN: {data['billed_to_gstin']}", border=0)
     pdf.set_x(112)
-    pdf.cell(86, 5, f"GSTIN: {data['shipped_to_gstin']}", border=0, ln=True)
+    pdf.cell(86, 5, f"GSTIN: {data['shipped_to_gstin']}", border=0)
+    pdf.ln(5)
     pdf.set_x(12)
     pdf.cell(86, 5, f"State: {data['billed_to_state']}")
     pdf.set_x(112)
@@ -85,8 +85,8 @@ def generate_invoice(data):
         total += amount
         pdf.cell(10, 6, str(i + 1), border=1, align='C')
         pdf.cell(80, 6, product['name'], border=1)
-        pdf.cell(20, 6, product['hsn_sac'], border=1, align='C')
-        pdf.cell(15, 6, str(product['qty']), border=1, align='C')
+        pdf.cell(20, 6, product['hsn_sac'], border=1)
+        pdf.cell(15, 6, str(product['qty']), border=1)
         pdf.cell(20, 6, f"{product['rate']:.2f}", border=1, align='R')
         pdf.cell(30, 6, f"{amount:.2f}", border=1, align='R', ln=True)
     pdf.ln(5)
@@ -203,11 +203,11 @@ st.subheader("Products / Services")
 products = []
 n = st.number_input("Number of Products", min_value=1, step=1)
 for i in range(n):
-    st.write(f"### Product {i+1}")
-    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
-    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
-    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
-    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
+    st.write(f"### Product {i + 1}")
+    name = st.text_input(f"Product {i + 1} Name", key=f"name_{i}")
+    hsn_sac = st.text_input(f"Product {i + 1} HSN/SAC Code", key=f"hsn_{i}")
+    qty = st.number_input(f"Product {i + 1} Quantity", min_value=1, key=f"qty_{i}")
+    rate = st.number_input(f"Product {i + 1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
     products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
