@@ -74,6 +74,8 @@ def generate_invoice(invoice_no, invoice_date, receiver_name, receiver_address, 
     pdf.cell(70, 7, f"{(total_amount * sgst) / 100:.2f}", align='R', ln=True)
     pdf.cell(120, 7, f"IGST ({igst}%):", align='L')
     pdf.cell(70, 7, f"{(total_amount * igst) / 100:.2f}", align='R', ln=True)
+    pdf.cell(120, 7, "Grand Total (in words):", align='L')
+    pdf.multi_cell(70, 7, num2words(total_amount, lang='en').title() + " Only", align='R')
     
     pdf.ln(10)
     pdf.cell(190, 7, "Bank Details: Punjab National Bank", ln=True)
@@ -92,20 +94,27 @@ def generate_invoice(invoice_no, invoice_date, receiver_name, receiver_address, 
     return temp_file.name
 
 st.title("Invoice Generator")
-st.text_input("Invoice No")
-st.date_input("Invoice Date", datetime.date.today())
-st.text_input("Receiver Name")
-st.text_area("Receiver Address")
-st.text_input("Receiver GSTIN")
-st.text_input("Receiver State")
-st.text_input("Consignee Name")
-st.text_area("Consignee Address")
-st.text_input("Consignee GSTIN")
-st.text_input("Consignee State")
-st.text_input("Transport Mode")
-st.text_input("Vehicle No")
-st.text_input("Date of Supply")
-st.text_input("Place of Supply")
-st.number_input("CGST (%)", min_value=0.0)
-st.number_input("SGST (%)", min_value=0.0)
-st.number_input("IGST (%)", min_value=0.0)
+
+invoice_no = st.text_input("Invoice No", "249")
+invoice_date = st.date_input("Invoice Date", datetime.date.today())
+receiver_name = st.text_input("Receiver Name", "Receiver Name")
+receiver_address = st.text_area("Receiver Address", "Receiver Address")
+receiver_gstin = st.text_input("Receiver GSTIN", "1234567890")
+consignee_name = st.text_input("Consignee Name", "Consignee Name")
+consignee_address = st.text_area("Consignee Address", "Consignee Address")
+consignee_gstin = st.text_input("Consignee GSTIN", "0987654321")
+transport_mode = st.text_input("Transport Mode", "Road")
+vehicle_no = st.text_input("Vehicle No", "HR-1234")
+date_of_supply = st.date_input("Date of Supply", datetime.date.today())
+place_of_supply = st.text_input("Place of Supply", "Bhiwani")
+cgst = st.number_input("CGST (%)", 0, 100, 9)
+sgst = st.number_input("SGST (%)", 0, 100, 9)
+igst = st.number_input("IGST (%)", 0, 100, 18)
+
+if st.button("Generate Invoice"):
+    pdf_file = generate_invoice(invoice_no, invoice_date, receiver_name, receiver_address, receiver_gstin,
+                                receiver_state, consignee_name, consignee_address, consignee_gstin, consignee_state,
+                                transport_mode, vehicle_no, date_of_supply, place_of_supply, [], cgst, sgst, igst)
+
+    with open(pdf_file, "rb") as file:
+        st.download_button(label="Download Invoice", data=file, file_name="invoice.pdf", mime="application/pdf")
