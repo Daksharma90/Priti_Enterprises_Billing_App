@@ -5,7 +5,7 @@ import os
 from num2words import num2words
 import datetime
 
-def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, items, cgst, sgst, igst):
+def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, items, cgst, sgst, igst):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=10)
     pdf.add_page()
@@ -21,6 +21,9 @@ def generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, st
     pdf.cell(95, 8, f"Invoice No: {invoice_no}")
     pdf.cell(95, 8, f"Invoice Date: {invoice_date}", ln=True)
     pdf.cell(95, 8, f"State: {state} (State Code: 06)", ln=True)
+    pdf.cell(95, 8, f"Transport Mode: {transport_mode}")
+    pdf.cell(95, 8, f"Vehicle No: {vehicle_no}", ln=True)
+    pdf.cell(95, 8, f"E-Way Bill No: {eway_bill}", ln=True)
     pdf.ln(5)
     
     pdf.set_font("Arial", "B", 11)
@@ -78,6 +81,9 @@ customer_name = st.text_input("Customer Name")
 address = st.text_area("Customer Address")
 gstin = st.text_input("GSTIN")
 state = st.text_input("State")
+transport_mode = st.text_input("Transport Mode")
+vehicle_no = st.text_input("Vehicle Number")
+eway_bill = st.text_input("E-Way Bill Number")
 cgst = st.number_input("CGST (%)", min_value=0.0, step=0.1)
 sgst = st.number_input("SGST (%)", min_value=0.0, step=0.1)
 igst = st.number_input("IGST (%)", min_value=0.0, step=0.1)
@@ -95,7 +101,7 @@ for i in range(num_items):
 
 if st.button("Generate Invoice"):
     if customer_name and all(item[0] for item in items):
-        pdf_path = generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, items, cgst, sgst, igst)
+        pdf_path = generate_invoice(invoice_no, invoice_date, customer_name, address, gstin, state, transport_mode, vehicle_no, eway_bill, items, cgst, sgst, igst)
         with open(pdf_path, "rb") as file:
             st.download_button("Download Invoice", file, file_name="invoice.pdf", mime="application/pdf")
         os.unlink(pdf_path)
