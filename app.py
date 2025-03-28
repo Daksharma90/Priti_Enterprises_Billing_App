@@ -11,6 +11,13 @@ def generate_invoice(data):
     
     # Header
     pdf.cell(200, 10, "PRITI ENTERPRISES", ln=True, align='C')
+    
+    # GST and Mobile Numbers
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(200, 6, "GSTIN: 06APGPK2323H1Z8", ln=True, align='C')  # Added GST Number
+    pdf.cell(200, 6, "Mobile: 9416083098, 9813269838", ln=True, align='C')  # Added Mobile Numbers
+    
+    # Address
     pdf.set_font("Arial", "", 10)
     pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
     pdf.ln(5)
@@ -114,7 +121,6 @@ def generate_invoice(data):
     return pdf.output(dest='S').encode('latin1')
 
 st.title("Invoice Generator")
-
 # Invoice Details
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
