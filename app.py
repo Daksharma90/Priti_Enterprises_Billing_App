@@ -10,10 +10,14 @@ def generate_invoice(data):
     pdf.set_font("Arial", "B", 12)
     
     # Header
-    pdf.set_font("Arial", "B", 12)
-    pdf.cell(55, 10, "GSTIN: 06APGPK2323H1Z8", align='L')
+    pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
+    pdf.cell(50, 10, "GSTIN: 06APGPK2323H1Z8", align='L')
+
+    pdf.set_font("Arial", "B", 16)  # Bigger font for PRITI ENTERPRISES
     pdf.cell(100, 10, "PRITI ENTERPRISES", align='C')
-    pdf.cell(55, 10, "Mobile: 9416083098, 9813269838", align='R', ln=True)
+
+    pdf.set_font("Arial", "B", 10)  # Smaller font for GST and Mobile
+    pdf.cell(50, 10, "Mobile: 9416083098, 9813269838", align='R', ln=True)
 
     pdf.set_font("Arial", "", 10)
     pdf.cell(200, 5, "Near Santu Tubwel, Tosham Road Baypass, Bhiwani - 127021 (Haryana)", ln=True, align='C')
