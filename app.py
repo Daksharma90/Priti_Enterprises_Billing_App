@@ -45,7 +45,7 @@ def generate_invoice(data):
     pdf.cell(100, 6, f"State: {data['shipped_to_state']}", ln=True)
     pdf.ln(5)
 
-    # Transportation Details  <--- ADDED SECTION
+    # Transportation Details
     pdf.set_font("Arial", "B", 10)
     pdf.cell(100, 6, "Transportation Details:", ln=True)
     pdf.set_font("Arial", "", 10)
@@ -53,6 +53,13 @@ def generate_invoice(data):
     pdf.cell(100, 6, f"Vehicle Number: {data['vehicle_number']}", ln=True)
     pdf.cell(100, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
     pdf.cell(100, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
+    pdf.ln(5)
+
+    # E-Way Bill Number  <--- ADDED SECTION
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(100, 6, "E-Way Bill Number:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(100, 6, f"E-Way Bill Number: {data['eway_bill_number']}", ln=True)
     pdf.ln(5)
 
     # Table Header
@@ -150,11 +157,14 @@ shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
 
-# Transportation Details  <--- INPUT FIELDS
+# Transportation Details
 transportation_mode = st.text_input("Transportation Mode")
 vehicle_number = st.text_input("Vehicle Number")
 date_of_supply = st.date_input("Date of Supply", datetime.date.today()).strftime("%d-%m-%Y")
 place_of_supply = st.text_input("Place of Supply")
+
+# E-Way Bill Number  <--- INPUT FIELD
+eway_bill_number = st.text_input("E-Way Bill Number")
 
 # Tax Rates (User Input)
 cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
@@ -176,4 +186,4 @@ for i in range(n):
 if st.button("Generate Invoice"):
     invoice_data = locals()
     pdf = generate_invoice(invoice_data)
-    st.download_button("Download Invoice", pdf, "application/pdf")
+    st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
