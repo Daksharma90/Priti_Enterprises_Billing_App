@@ -102,31 +102,38 @@ reverse_charge = st.selectbox("Reverse Charge", ["Y", "N"])
 
 # Billed To
 billed_to_name = st.text_input("Billed To - Name")
-billed_to_gstin = st.text_input("Billed To - GSTIN")
 billed_to_address = st.text_area("Billed To - Address")
 billed_to_state = st.text_input("Billed To - State")
 
 # Shipped To
 shipped_to_name = st.text_input("Shipped To - Name")
-shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
 
-# Store data and generate invoice
+# Product Details
+st.subheader("Products / Services")
+products = []
+n = st.number_input("Number of Products", min_value=1, step=1)
+for i in range(n):
+    st.write(f"### Product {i+1}")
+    name = st.text_input(f"Product {i+1} Name")
+    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code")
+    qty = st.number_input(f"Product {i+1} Quantity", min_value=1)
+    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f")
+    products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
+
 if st.button("Generate Invoice"):
     invoice_data = {
         "invoice_no": invoice_no,
         "invoice_date": invoice_date,
         "reverse_charge": reverse_charge,
         "billed_to_name": billed_to_name,
-        "billed_to_gstin": billed_to_gstin,
         "billed_to_address": billed_to_address,
         "billed_to_state": billed_to_state,
         "shipped_to_name": shipped_to_name,
-        "shipped_to_gstin": shipped_to_gstin,
         "shipped_to_address": shipped_to_address,
         "shipped_to_state": shipped_to_state,
-        "products": []
+        "products": products
     }
     pdf = generate_invoice(invoice_data)
     st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
