@@ -27,7 +27,7 @@ def generate_invoice(data):
     # Invoice Details
     pdf.cell(100, 6, f"Invoice No: {data['invoice_no']}")
     pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
-    pdf.cell(100, 6, f"State: Haryana  State Code: 06")
+    pdf.cell(100, 6, f"State: Haryana State Code: 06")
     pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
     pdf.ln(5)
     
@@ -44,6 +44,16 @@ def generate_invoice(data):
     pdf.cell(100, 6, f"Address: {data['shipped_to_address']}", ln=True)
     pdf.cell(100, 6, f"State: {data['billed_to_state']}")
     pdf.cell(100, 6, f"State: {data['shipped_to_state']}", ln=True)
+    pdf.ln(5)
+
+    # Transportation Details  <--- ADDED SECTION
+    pdf.set_font("Arial", "B", 10)
+    pdf.cell(100, 6, "Transportation Details:", ln=True)
+    pdf.set_font("Arial", "", 10)
+    pdf.cell(100, 6, f"Transportation Mode: {data['transportation_mode']}", ln=True)
+    pdf.cell(100, 6, f"Vehicle Number: {data['vehicle_number']}", ln=True)
+    pdf.cell(100, 6, f"Date of Supply: {data['date_of_supply']}", ln=True)
+    pdf.cell(100, 6, f"Place of Supply: {data['place_of_supply']}", ln=True)
     pdf.ln(5)
     
     # Table Header
@@ -101,7 +111,7 @@ def generate_invoice(data):
 
     # Footer Section
     pdf.ln(20)  
-     # Bank Details
+    # Bank Details
     pdf.set_font("Arial", "B", 10)
     pdf.cell(200, 6, "Bank Details:", ln=True)
     pdf.set_font("Arial", "", 10)
@@ -140,6 +150,12 @@ shipped_to_name = st.text_input("Shipped To - Name")
 shipped_to_gstin = st.text_input("Shipped To - GSTIN")
 shipped_to_address = st.text_area("Shipped To - Address")
 shipped_to_state = st.text_input("Shipped To - State")
+
+# Transportation Details  <--- ADDED INPUT FIELDS
+transportation_mode = st.text_input("Transportation Mode")
+vehicle_number = st.text_input("Vehicle Number")
+date_of_supply = st.date_input("Date of Supply", datetime.date.today()).strftime("%d-%m-%Y")
+place_of_supply = st.text_input("Place of Supply")
 
 # Tax Rates (User Input)
 cgst_rate = st.number_input("CGST Rate (%)", min_value=0.0, step=0.1, format="%.1f")
