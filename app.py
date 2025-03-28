@@ -1,20 +1,6 @@
 import streamlit as st
 from fpdf import FPDF
 import datetime
-from num2words import num2words
-
-def convert_number_to_words(amount):
-    """Convert total amount to words in Indian Rupees format"""
-    rupees = int(amount)
-    paise = round((amount - rupees) * 100)
-    
-    rupees_words = num2words(rupees, lang="en_IN").title()
-    paise_words = num2words(paise, lang="en_IN").title() if paise > 0 else ""
-
-    if paise > 0:
-        return f"Rupees {rupees_words} And Paise {paise_words} Only"
-    else:
-        return f"Rupees {rupees_words} Only"
 
 def generate_invoice(data):
     pdf = FPDF()
@@ -31,7 +17,7 @@ def generate_invoice(data):
     # Invoice Details
     pdf.cell(100, 6, f"Invoice No: {data['invoice_no']}")
     pdf.cell(100, 6, f"Invoice Date: {data['invoice_date']}", ln=True)
-    pdf.cell(100, 6, "State: Haryana  State Code: 06")
+    pdf.cell(100, 6, f"State: Haryana  State Code: 06")
     pdf.cell(100, 6, f"Reverse Charge: {data['reverse_charge']}", ln=True)
     pdf.ln(5)
     
@@ -67,10 +53,10 @@ def generate_invoice(data):
         pdf.cell(80, 6, product['name'], border=1)
         pdf.cell(20, 6, product['hsn_sac'], border=1)
         pdf.cell(15, 6, str(product['qty']), border=1)
-        pdf.cell(20, 6, f"{product['rate']:.2f}", border=1)
-        amount = round(product['qty'] * product['rate'], 2)
+        pdf.cell(20, 6, str(product['rate']), border=1)
+        amount = product['qty'] * product['rate']
         total += amount
-        pdf.cell(30, 6, f"{amount:.2f}", border=1, ln=True)
+        pdf.cell(30, 6, str(amount), border=1, ln=True)
     
     pdf.ln(5)
 
@@ -78,24 +64,20 @@ def generate_invoice(data):
     cgst = round(total * 0.09, 2)
     sgst = round(total * 0.09, 2)
     total_after_tax = round(total + cgst + sgst, 2)
-    total_in_words = convert_number_to_words(total_after_tax)
 
     # Right-Aligned Totals
     pdf.cell(145, 6, "Total Amount Before Tax:", border=0, align='R')
-    pdf.cell(30, 6, f"{total:.2f}", border=1, ln=True)
+    pdf.cell(30, 6, str(total), border=1, ln=True)
     
     pdf.cell(145, 6, "CGST (9%):", border=0, align='R')
-    pdf.cell(30, 6, f"{cgst:.2f}", border=1, ln=True)
+    pdf.cell(30, 6, str(cgst), border=1, ln=True)
     
     pdf.cell(145, 6, "SGST (9%):", border=0, align='R')
-    pdf.cell(30, 6, f"{sgst:.2f}", border=1, ln=True)
+    pdf.cell(30, 6, str(sgst), border=1, ln=True)
     
     pdf.cell(145, 6, "Total Amount After Tax:", border=0, align='R')
-    pdf.cell(30, 6, f"{total_after_tax:.2f}", border=1, ln=True)
-
-    pdf.ln(5)
-    pdf.cell(200, 6, f"Total Invoice Amount in Words: {total_in_words}", ln=True)
-
+    pdf.cell(30, 6, str(total_after_tax), border=1, ln=True)
+    
     pdf.ln(10)
     
     # Bank Details
@@ -121,6 +103,7 @@ def generate_invoice(data):
 
 st.title("Invoice Generator")
 
+# Invoice Details
 invoice_no = st.text_input("Invoice No", "249")
 invoice_date = st.date_input("Invoice Date", datetime.date.today()).strftime("%d-%m-%Y")
 reverse_charge = st.selectbox("Reverse Charge", ["Yes", "No"])
@@ -142,9 +125,27 @@ st.subheader("Products / Services")
 products = []
 n = st.number_input("Number of Products", min_value=1, step=1)
 for i in range(n):
-    products.append({})
+    st.write(f"### Product {i+1}")
+    name = st.text_input(f"Product {i+1} Name", key=f"name_{i}")
+    hsn_sac = st.text_input(f"Product {i+1} HSN/SAC Code", key=f"hsn_{i}")
+    qty = st.number_input(f"Product {i+1} Quantity", min_value=1, key=f"qty_{i}")
+    rate = st.number_input(f"Product {i+1} Rate", min_value=0.0, format="%.2f", key=f"rate_{i}")
+    products.append({"name": name, "hsn_sac": hsn_sac, "qty": qty, "rate": rate})
 
 if st.button("Generate Invoice"):
-    invoice_data = {...}
+    invoice_data = {
+        "invoice_no": invoice_no,
+        "invoice_date": invoice_date,
+        "reverse_charge": reverse_charge,
+        "billed_to_name": billed_to_name,
+        "billed_to_gstin": billed_to_gstin,
+        "billed_to_address": billed_to_address,
+        "billed_to_state": billed_to_state,
+        "shipped_to_name": shipped_to_name,
+        "shipped_to_gstin": shipped_to_gstin,
+        "shipped_to_address": shipped_to_address,
+        "shipped_to_state": shipped_to_state,
+        "products": products
+    }
     pdf = generate_invoice(invoice_data)
     st.download_button("Download Invoice", pdf, "invoice.pdf", "application/pdf")
