@@ -1,7 +1,7 @@
 import streamlit as st
 from fpdf import FPDF
 import datetime
-from num2words import num2words  # Added for amount in words
+from num2words import num2words  
 
 
 def generate_invoice(data):
